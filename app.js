@@ -93,7 +93,7 @@ function main() {
 		rankings.sort((a, b) => (Number.isFinite(b.pct) ? b.pct : -Infinity) - (Number.isFinite(a.pct) ? a.pct : -Infinity));
 
 		// CSV header for the year
-		console.log(`\nYear ${year} — CSV: Rank,Name,Symbol,Start,End,Change,Pct`);
+		console.log(`\nYear ${year} : Rank,Name,Symbol,Start,End,Change,Pct`);
 		rankings.forEach((r, idx) => {
 			const cols = [
 				String(idx + 1),
