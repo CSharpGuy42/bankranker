@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canadian Bank Stocks: A Cyclical Analysis (2019-2026)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    
+    <!-- Palette: "Energetic & Playful" / Cyber-Vibrant
+         Primary: #4361EE (Bright Blue)
+         Secondary: #F72585 (Neon Pink)
+         Accent: #4CC9F0 (Cyan)
+         Dark: #3A0CA3 (Deep Indigo)
+         Warm: #FFB703 (Amber)
+         Neutral: #F3F4F6 (Gray-100)
+    -->
+    
+    <!-- Plan Summary:
+         1. Intro: The Big Six & Macro Trends (Line Chart)
+         2. The Anchor: National Bank's Consistency (Rank Step Chart)
+         3. The Rebound: CIBC/BNS Volatility (Bar Chart)
+         4. The Pivot: TD's 2026 Surge (Comparison Bar)
+         5. Ranking History: Grid Timeline
+         6. Conclusion
+         
+         Chart Selection Justification (NO SVG):
+         - Trends: Chart.js Line (Canvas) - Best for time series.
+         - Rankings: Chart.js Line (Canvas) - Best for showing ordinal position stability.
+         - Comparisons: Chart.js Bar (Canvas) - Best for categorical magnitude comparison.
+         - Timeline: HTML Grid (Divs) - Best for text/icon layout without SVG.
+    -->
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F3F4F6;
+            color: #1F2937;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 500px;
+        }
+
+        /* Custom Scrollbar for subtle nav */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4361EE; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3A0CA3; 
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-slate-800 antialiased">
+
+    <!-- Header / Hook -->
+    <header class="bg-gradient-to-r from-[#3A0CA3] to-[#4361EE] text-white py-12 px-4 shadow-lg mb-8">
+        <div class="max-w-6xl mx-auto text-center">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-4 tracking-tight">The Big Six</h1>
+            <h2 class="text-xl md:text-2xl font-light opacity-90">A Performance Analysis of Canadian Bank Stocks (2019–2026)</h2>
+            <div class="mt-8 flex justify-center gap-4 flex-wrap">
+                <span class="bg-white/20 px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm">Synced Movements</span>
+                <span class="bg-white/20 px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm">Cyclical Patterns</span>
+                <span class="bg-white/20 px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm">Volatile Surges</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 pb-12 space-y-16">
+
+        <!-- Section 1: Macro-Correlation -->
+        <section class="bg-white rounded-2xl shadow-md p-6 md:p-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="md:col-span-1 space-y-4">
+                    <h3 class="text-3xl font-bold text-[#3A0CA3]">The Herd Mentality</h3>
+                    <div class="w-16 h-1 bg-[#F72585] rounded-full"></div>
+                    <p class="text-gray-600 leading-relaxed">
+                        The most striking pattern in the sector is <strong>Directional Synchronization</strong>. When the market moves, the "Big Six" move as a single asset class.
+                    </p>
+                    <p class="text-gray-600 leading-relaxed">
+                        Whether facing regulatory headwinds in 2019 or explosive growth in 2026, no single bank is immune to the sector's gravitational pull. Note the "Universal Up" years of 2022 and 2026.
+                    </p>
+                    <div class="bg-[#F0F9FF] p-4 rounded-lg border-l-4 border-[#4CC9F0]">
+                        <p class="text-sm font-bold text-[#0D47A1]">Key Insight:</p>
+                        <p class="text-sm text-gray-700">2026 was a "Super Cycle" year where every bank posted >29% gains.</p>
+                    </div>
+                </div>
+                <div class="md:col-span-2 flex flex-col justify-center bg-gray-50 rounded-xl border border-gray-100 p-4">
+                    <div class="chart-container">
+                        <canvas id="macroChart"></canvas>
+                    </div>
+                    <p class="text-center text-xs text-gray-400 mt-2">Year-over-Year % Growth (2019-2026)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: National Bank Consistency -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white rounded-2xl shadow-md p-6 md:p-8 order-2 md:order-1">
+                <div class="chart-container">
+                    <canvas id="rankChart"></canvas>
+                </div>
+                <p class="text-center text-xs text-gray-400 mt-2">Annual Performance Ranking (Lower is Better)</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-md p-6 md:p-8 order-1 md:order-2 flex flex-col justify-center">
+                <h3 class="text-3xl font-bold text-[#3A0CA3] mb-2">The Anchor: National Bank</h3>
+                <h4 class="text-xl font-semibold text-[#F72585] mb-4">Consistency Over Volatility</h4>
+                <p class="text-gray-600 leading-relaxed mb-6">
+                    While others fluctuate wildly, <strong>National Bank (NA)</strong> acts as the sector's anchor. It exhibits a unique "High-Floor" pattern, never dropping below Rank 4 in eight years.
+                </p>
+                <ul class="space-y-3">
+                    <li class="flex items-start">
+                        <span class="text-[#4361EE] mr-2 text-xl">&#10003;</span>
+                        <span class="text-gray-700"><strong>Recovery Leader:</strong> Consistently Top 2 during recovery years (2020, 2022, 2024).</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-[#4361EE] mr-2 text-xl">&#10003;</span>
+                        <span class="text-gray-700"><strong>Down-Market Resilience:</strong> Lost less value than peers in bearish 2023.</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Section 3: The Rubber Band Effect -->
+        <section class="bg-[#3A0CA3] rounded-2xl shadow-lg p-8 text-white">
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <h3 class="text-3xl font-bold mb-4">The "Rubber-Band" Effect</h3>
+                <p class="text-blue-100 opacity-90">
+                    CIBC and Scotiabank (BNS) often exhibit an inverse relationship to stability. When they underperform significantly, they "snap back" violently in subsequent cycles.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Card 1: The Laggard Phase -->
+                <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+                    <h4 class="text-xl font-bold text-[#4CC9F0] mb-2">Phase 1: Compression</h4>
+                    <p class="text-sm text-gray-300 mb-4">2023 Performance</p>
+                    <div class="flex items-end space-x-4 h-32 pb-2 border-b border-white/20">
+                        <div class="w-1/2 bg-red-400/80 rounded-t-lg h-[80%] flex items-center justify-center relative group">
+                            <span class="text-xs font-bold">-26%</span>
+                            <div class="absolute bottom-0 text-xs mb-[-20px]">CIBC</div>
+                        </div>
+                        <div class="w-1/2 bg-red-500/80 rounded-t-lg h-[90%] flex items-center justify-center relative">
+                            <span class="text-xs font-bold">-28%</span>
+                            <div class="absolute bottom-0 text-xs mb-[-20px]">BNS</div>
+                        </div>
+                    </div>
+                    <p class="mt-8 text-sm text-gray-300 italic">Both banks hit bottom ranks, significantly underperforming the sector.</p>
+                </div>
+
+                <!-- Card 2: The Snap Back -->
+                <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+                    <h4 class="text-xl font-bold text-[#FFB703] mb-2">Phase 2: Release</h4>
+                    <p class="text-sm text-gray-300 mb-4">2024-2025 Recovery</p>
+                     <div class="flex items-end space-x-4 h-32 pb-2 border-b border-white/20">
+                        <div class="w-1/2 bg-green-400/80 rounded-t-lg h-[90%] flex items-center justify-center relative">
+                            <span class="text-xs font-bold text-black">#1 Rank</span>
+                            <div class="absolute bottom-0 text-xs mb-[-20px]">CIBC</div>
+                        </div>
+                        <div class="w-1/2 bg-green-500/50 rounded-t-lg h-[50%] flex items-center justify-center relative">
+                            <span class="text-xs font-bold">Lagging</span>
+                            <div class="absolute bottom-0 text-xs mb-[-20px]">BNS</div>
+                        </div>
+                    </div>
+                    <p class="mt-8 text-sm text-gray-300 italic">CIBC surges to Rank 1 for two consecutive years, completing the rubber-band snap.</p>
+                </div>
+
+                <!-- Card 3: Analysis -->
+                <div class="bg-white text-gray-800 rounded-xl p-6">
+                    <h4 class="text-lg font-bold text-[#3A0CA3] mb-3">Divergence Analysis</h4>
+                    <p class="text-sm leading-relaxed mb-4">
+                        While <strong>BNS</strong> and <strong>CIBC</strong> often fall together, their recoveries decoupled in 2024. CIBC successfully monetized the recovery, while Scotiabank remained in the bottom half before finally joining the rally in 2026.
+                    </p>
+                    <div class="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-[#F72585] w-2/3"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">Volatility Index: High</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: TD's Volatility Pivot -->
+        <section class="bg-white rounded-2xl shadow-md p-6 md:p-8">
+            <div class="mb-8">
+                <h3 class="text-3xl font-bold text-[#3A0CA3]">The Coiled Spring: TD Bank</h3>
+                <p class="text-gray-600 mt-2 max-w-2xl">
+                    TD Bank exemplifies the "Boom or Bust" nature of the sector. After a grueling 5-year streak of underperformance (Ranks 3-6), it delivered the single most explosive year in the dataset.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="chart-container">
+                    <canvas id="tdPivotChart"></canvas>
+                </div>
+                <div class="space-y-6">
+                    <div class="p-4 bg-red-50 rounded-lg border-l-4 border-red-400">
+                        <h5 class="font-bold text-red-800">2025: The Bottom</h5>
+                        <p class="text-sm text-red-600">TD was the worst performer (-10.72%) while others rallied.</p>
+                    </div>
+                    <div class="flex justify-center">
+                        <span class="text-4xl text-gray-300 font-light">&#8595; pivot &#8595;</span>
+                    </div>
+                    <div class="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
+                        <h5 class="font-bold text-green-800">2026: The Explosion</h5>
+                        <p class="text-sm text-green-700">TD surged <strong>+69.70%</strong>, taking Rank 1 by a massive margin.</p>
+                    </div>
+                    <p class="text-xs text-gray-500 italic">
+                        *Protracted underperformance often leads to the most violent upward corrections.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: The Leaderboard Timeline -->
+        <section>
+            <h3 class="text-2xl font-bold text-[#3A0CA3] mb-6 text-center">Yearly Champions (Rank 1)</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+                
+                <!-- 2019 -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition-shadow">
+                    <span class="text-xs font-bold text-gray-400 mb-2">2019</span>
+                    <div class="w-12 h-12 bg-[#4CC9F0] rounded-full flex items-center justify-center text-white font-bold shadow-sm mb-2">TD</div>
+                    <span class="text-sm font-semibold text-gray-700">TD Bank</span>
+                </div>
+
+                <!-- 2020 -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition-shadow">
+                    <span class="text-xs font-bold text-gray-400 mb-2">2020</span>
+                    <div class="w-12 h-12 bg-[#F72585] rounded-full flex items-center justify-center text-white font-bold shadow-sm mb-2">NA</div>
+                    <span class="text-sm font-semibold text-gray-700">National</span>
+                </div>
+
+                <!-- 2021 -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition-shadow">
+                    <span class="text-xs font-bold text-gray-400 mb-2">2021</span>
+                    <div class="w-12 h-12 bg-[#4361EE] rounded-full flex items-center justify-center text-white font-bold shadow-sm mb-2">RY</div>
+                    <span class="text-sm font-semibold text-gray-700">Royal</span>
+                </div>
+
+                <!-- 2022 -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition-shadow">
+                    <span class="text-xs font-bold text-gray-400 mb-2">2022</span>
+                    <div class="w-12 h-12 bg-[#3A0CA3] rounded-full flex items-center justify-center text-white font-bold shadow-sm mb-2">BMO</div>
+                    <span class="text-sm font-semibold text-gray-700">BMO</span>
+                </div>
+
+                <!-- 2023 -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition-shadow">
+                    <span class="text-xs font-bold text-gray-400 mb-2">2023</span>
+                    <div class="w-12 h-12 bg-[#4361EE] rounded-full flex items-center justify-center text-white font-bold shadow-sm mb-2">RY</div>
+                    <span class="text-sm font-semibold text-gray-700">Royal</span>
+                </div>
+
+                <!-- 2024 -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition-shadow">
+                    <span class="text-xs font-bold text-gray-400 mb-2">2024</span>
+                    <div class="w-12 h-12 bg-[#FFB703] rounded-full flex items-center justify-center text-white font-bold shadow-sm mb-2">CM</div>
+                    <span class="text-sm font-semibold text-gray-700">CIBC</span>
+                </div>
+
+                <!-- 2025 -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition-shadow">
+                    <span class="text-xs font-bold text-gray-400 mb-2">2025</span>
+                    <div class="w-12 h-12 bg-[#FFB703] rounded-full flex items-center justify-center text-white font-bold shadow-sm mb-2">CM</div>
+                    <span class="text-sm font-semibold text-gray-700">CIBC</span>
+                </div>
+
+                <!-- 2026 -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition-shadow">
+                    <span class="text-xs font-bold text-gray-400 mb-2">2026</span>
+                    <div class="w-12 h-12 bg-[#4CC9F0] rounded-full flex items-center justify-center text-white font-bold shadow-sm mb-2">TD</div>
+                    <span class="text-sm font-semibold text-gray-700">TD Bank</span>
+                </div>
+
+            </div>
+            <p class="text-center text-sm text-gray-500 mt-6 max-w-2xl mx-auto">
+                <strong>Insight:</strong> Rank 1 is transient. Only CIBC (2024-2025) managed to hold the top spot for two consecutive years, highlighting the fiercely competitive and cyclical nature of the group.
+            </p>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center pt-12 border-t border-gray-200 mt-12">
+            <p class="text-gray-400 text-sm mb-2">Analysis based on market data 2019-2026</p>
+            <p class="text-[#3A0CA3] font-bold text-lg">Canadian Bank Stocks: The Catch-Up Game</p>
+        </footer>
+
+    </main>
+
+    <!-- Script Block for Charts -->
+    <script>
+        // --- Data Setup ---
+        // Colors: RY=#4361EE, TD=#4CC9F0, NA=#F72585, BMO=#3A0CA3, BNS=#7209B7, CM=#FFB703
+        const colors = {
+            TD: '#4CC9F0',
+            RY: '#4361EE',
+            NA: '#F72585',
+            BMO: '#3A0CA3',
+            BNS: '#7209B7',
+            CM: '#FFB703'
+        };
+
+        const years = ['2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026'];
+
+        // % Change Data
+        const dataChange = {
+            TD: [-7.41, 7.58, -2.02, 38.10, -11.76, -2.26, -10.72, 69.70],
+            RY: [-9.06, 10.61, 1.09, 30.72, -6.44, 4.62, 28.61, 36.16],
+            NA: [-9.47, 26.69, -0.04, 38.71, -7.67, 9.63, 29.82, 32.78],
+            BMO: [-10.76, 12.61, -4.82, 46.96, -11.77, 4.84, 7.13, 29.92],
+            BNS: [-16.21, 7.90, -8.06, 34.16, -28.24, -2.85, 21.98, 32.56],
+            CM: [-16.44, 5.81, -0.20, 38.53, -25.96, 15.11, 41.79, 39.59]
+        };
+
+        // Rank Data
+        const dataRank = {
+            TD: [1, 5, 4, 4, 3, 5, 6, 1],
+            RY: [2, 3, 1, 6, 1, 4, 3, 3],
+            NA: [3, 1, 2, 2, 2, 2, 2, 4],
+            BMO: [4, 2, 5, 1, 4, 3, 5, 6],
+            BNS: [5, 4, 6, 5, 6, 6, 4, 5],
+            CM: [6, 6, 3, 3, 5, 1, 1, 2]
+        };
+
+        // --- Common Plugin Config (Label Wrapping) ---
+        const commonPlugins = {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    padding: 20,
+                    font: { family: 'Inter', size: 12 }
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(31, 41, 55, 0.9)',
+                titleFont: { family: 'Inter', size: 13 },
+                bodyFont: { family: 'Inter', size: 13 },
+                padding: 12,
+                cornerRadius: 8,
+                callbacks: {
+                    title: function(tooltipItems) {
+                        const item = tooltipItems[0];
+                        let label = item.chart.data.labels[item.dataIndex];
+                        if (Array.isArray(label)) {
+                            return label.join(' ');
+                        } else {
+                            return label;
+                        }
+                    }
+                }
+            }
+        };
+
+        // --- Chart 1: Macro Trends (Line) ---
+        const ctxMacro = document.getElementById('macroChart').getContext('2d');
+        new Chart(ctxMacro, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [
+                    { label: 'TD', data: dataChange.TD, borderColor: colors.TD, borderWidth: 2, tension: 0.3, pointRadius: 3 },
+                    { label: 'Royal', data: dataChange.RY, borderColor: colors.RY, borderWidth: 2, tension: 0.3, pointRadius: 3 },
+                    { label: 'National', data: dataChange.NA, borderColor: colors.NA, borderWidth: 3, tension: 0.3, pointRadius: 5 }, // Highlight NA
+                    { label: 'BMO', data: dataChange.BMO, borderColor: colors.BMO, borderWidth: 2, tension: 0.3, pointRadius: 3 },
+                    { label: 'Scotiabank', data: dataChange.BNS, borderColor: colors.BNS, borderWidth: 2, tension: 0.3, pointRadius: 3 },
+                    { label: 'CIBC', data: dataChange.CM, borderColor: colors.CM, borderWidth: 2, tension: 0.3, pointRadius: 3 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: commonPlugins,
+                scales: {
+                    y: {
+                        grid: { color: '#E5E7EB' },
+                        title: { display: true, text: '% Change' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // --- Chart 2: NA Rank Consistency (Inverted Line) ---
+        const ctxRank = document.getElementById('rankChart').getContext('2d');
+        new Chart(ctxRank, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [
+                    { 
+                        label: 'National Bank (NA)', 
+                        data: dataRank.NA, 
+                        borderColor: colors.NA, 
+                        backgroundColor: 'rgba(247, 37, 133, 0.1)',
+                        borderWidth: 4, 
+                        pointRadius: 6,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: colors.NA,
+                        fill: true,
+                        tension: 0.2
+                    },
+                    { 
+                        label: 'Sector Average Rank', 
+                        data: [3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5], 
+                        borderColor: '#9CA3AF', 
+                        borderWidth: 2, 
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        tension: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    ...commonPlugins,
+                    legend: { display: true }
+                },
+                scales: {
+                    y: {
+                        reverse: true, // Rank 1 is top
+                        min: 1,
+                        max: 6,
+                        ticks: { stepSize: 1 },
+                        title: { display: true, text: 'Rank (1 is Best)' },
+                        grid: { color: '#E5E7EB' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // --- Chart 3: TD Pivot (Bar) ---
+        const ctxTD = document.getElementById('tdPivotChart').getContext('2d');
+        new Chart(ctxTD, {
+            type: 'bar',
+            data: {
+                labels: [['2025', 'Growth'], ['2026', 'Growth']],
+                datasets: [
+                    {
+                        label: 'TD Bank',
+                        data: [-10.72, 69.70],
+                        backgroundColor: [
+                            'rgba(239, 68, 68, 0.8)', // Red for loss
+                            'rgba(76, 201, 240, 0.8)'  // Cyan for gain
+                        ],
+                        borderWidth: 0,
+                        borderRadius: 8
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: commonPlugins.tooltip
+                },
+                scales: {
+                    y: {
+                        grid: { color: '#E5E7EB' },
+                        title: { display: true, text: '% Return' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
